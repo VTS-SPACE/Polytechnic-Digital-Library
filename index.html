@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Polytechnic Digital Library and Book Circulation Management System">
+    <title>Polytechnic Digital Library | Circulation Desk</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <a class="brand" href="#dashboard" aria-label="Polytechnic Digital Library home">
+                <span class="brand-mark" aria-hidden="true">DL</span>
+                <span>
+                    <strong>Polytechnic Digital Library</strong>
+                    <small>Department of Computer Science &amp; Information Technology</small>
+                </span>
+            </a>
+            <div class="header-meta">
+                <span class="status-dot" aria-hidden="true"></span>
+                <span>Library Desk Online</span>
+                <time id="todayLabel"></time>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-shell">
+        <section class="hero" id="dashboard" aria-labelledby="pageTitle">
+            <div>
+                <p class="eyebrow">LIBRARY ADMINISTRATION PORTAL</p>
+                <h1 id="pageTitle">Book circulation, kept simple.</h1>
+                <p class="hero-copy">Manage your department collection, issue books to students, and keep every return
+                    accountable from one desk.</p>
+            </div>
+            <div class="hero-note">
+                <span class="hero-note-label">Current desk date</span>
+                <strong id="heroDate"></strong>
+                <span>Fine rate: ₹2 per overdue day</span>
+            </div>
+        </section>
+
+        <section class="stats-grid" aria-label="Library summary">
+            <article class="stat-card stat-blue">
+                <div class="stat-icon" aria-hidden="true">BK</div>
+                <div><span class="stat-label">Total Books in Library</span><strong id="totalBooks">0</strong><span
+                        class="stat-detail">Available volumes</span></div>
+            </article>
+            <article class="stat-card stat-amber">
+                <div class="stat-icon" aria-hidden="true">IS</div>
+                <div><span class="stat-label">Books Currently Issued</span><strong id="issuedBooks">0</strong><span
+                        class="stat-detail">Active circulation records</span></div>
+            </article>
+            <article class="stat-card stat-red">
+                <div class="stat-icon" aria-hidden="true">OD</div>
+                <div><span class="stat-label">Overdue / Late Books</span><strong id="overdueBooks">0</strong><span
+                        class="stat-detail">Needs follow-up today</span></div>
+            </article>
+            <article class="stat-card stat-green">
+                <div class="stat-icon" aria-hidden="true">₹</div>
+                <div><span class="stat-label">Total Fine Collected</span><strong id="totalFine">₹0</strong><span
+                        class="stat-detail">From completed returns</span></div>
+            </article>
+        </section>
+
+        <div id="notice" class="notice" role="status" aria-live="polite"></div>
+
+        <section class="content-section" id="inventory" aria-labelledby="inventoryTitle">
+            <div class="section-heading">
+                <div>
+                    <p class="section-kicker">COLLECTION CONTROL</p>
+                    <h2 id="inventoryTitle">Book inventory</h2>
+                </div>
+                <span class="record-count" id="bookCount">0 titles</span>
+            </div>
+            <div class="module-grid">
+                <form class="panel form-panel" id="bookForm">
+                    <div class="panel-heading">
+                        <div><span class="panel-index">01</span>
+                            <h3 id="bookFormTitle">Add a new book</h3>
+                        </div><span class="required-note">* Required</span>
+                    </div>
+                    <label for="bookTitle">Book title <span>*</span></label>
+                    <input id="bookTitle" name="title" type="text" placeholder="e.g. Object-Oriented Programming"
+                        required maxlength="120">
+                    <label for="bookAuthor">Author name <span>*</span></label>
+                    <input id="bookAuthor" name="author" type="text" placeholder="e.g. Herbert Schildt" required
+                        maxlength="100">
+                    <label for="bookCode">Accession / book code <span>*</span></label>
+                    <input id="bookCode" name="code" type="text" placeholder="e.g. BK-105" pattern="[A-Za-z0-9-]+"
+                        required maxlength="20">
+                    <div class="two-col">
+                        <div><label for="bookCategory">Category <span>*</span></label><select id="bookCategory"
+                                name="category" required>
+                                <option value="">Select category</option>
+                                <option>Computer Science</option>
+                                <option>IT</option>
+                                <option>Electronics</option>
+                                <option>Mathematics</option>
+                                <option>General</option>
+                            </select></div>
+                        <div><label for="bookQuantity">Available copies <span>*</span></label><input id="bookQuantity"
+                                name="quantity" type="number" min="1" step="1" placeholder="e.g. 3" required></div>
+                    </div>
+                    <button class="button button-primary" id="bookSubmitButton" type="submit"><span
+                            aria-hidden="true">+</span> Add book to library</button><button
+                        class="button button-secondary" id="cancelBookEdit" type="button" hidden>Cancel edit</button>
+                </form>
+
+                <div class="panel table-panel">
+                    <div class="table-toolbar">
+                        <div>
+                            <h3>Collection catalogue</h3>
+                            <p>Search by title or accession number.</p>
+                        </div><label class="search-box" for="bookSearch"><span aria-hidden="true">⌕</span><input
+                                id="bookSearch" type="search" placeholder="Search books..."
+                                aria-label="Search books"></label>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Book details</th>
+                                    <th>Category</th>
+                                    <th>Stock</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="booksTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div class="empty-state" id="booksEmpty" hidden><span class="empty-icon"
+                            aria-hidden="true">BK</span><strong>No books match your search</strong>
+                        <p>Try another title or accession number.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section circulation-section" id="circulation" aria-labelledby="circulationTitle">
+            <div class="section-heading">
+                <div>
+                    <p class="section-kicker">CIRCULATION DESK</p>
+                    <h2 id="circulationTitle">Issue a book</h2>
+                </div><span class="desk-label">14-day standard loan</span>
+            </div>
+            <form class="panel issue-form" id="issueForm">
+                <div class="form-block"><span class="panel-index">02</span>
+                    <h3>Student details</h3>
+                    <div class="two-col">
+                        <div><label for="studentName">Student full name <span>*</span></label><input id="studentName"
+                                name="studentName" type="text" placeholder="Enter student's full name" required
+                                maxlength="100"></div>
+                        <div><label for="rollNumber">Enrollment / roll number <span>*</span></label><input
+                                id="rollNumber" name="rollNumber" type="text" placeholder="e.g. CSE24-031" required
+                                maxlength="30"></div>
+                    </div>
+                    <div class="two-col">
+                        <div><label for="studentBranch">Branch <span>*</span></label><select id="studentBranch"
+                                name="branch" required>
+                                <option value="">Select branch</option>
+                                <option>CSE</option>
+                                <option>IT</option>
+                                <option>ME</option>
+                                <option>EE</option>
+                                <option>Civil</option>
+                            </select></div>
+                        <div><label for="studentSemester">Semester <span>*</span></label><select id="studentSemester"
+                                name="semester" required>
+                                <option value="">Select semester</option>
+                                <option>Semester 1</option>
+                                <option>Semester 2</option>
+                                <option>Semester 3</option>
+                                <option>Semester 4</option>
+                                <option>Semester 5</option>
+                                <option>Semester 6</option>
+                            </select></div>
+                    </div>
+                </div>
+                <div class="form-block"><span class="panel-index">03</span>
+                    <h3>Loan details</h3><label for="issueBook">Select available book <span>*</span></label><select
+                        id="issueBook" name="bookId" required>
+                        <option value="">Select a book with available stock</option>
+                    </select>
+                    <div class="two-col">
+                        <div><label for="issueDate">Issue date <span>*</span></label><input id="issueDate"
+                                name="issueDate" type="date" required></div>
+                        <div><label for="dueDate">Return due date</label><input id="dueDate" name="dueDate" type="date"
+                                readonly></div>
+                    </div><button class="button button-primary" type="submit"><span aria-hidden="true">→</span> Issue
+                        book</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="content-section" id="issued" aria-labelledby="issuedTitle">
+            <div class="section-heading">
+                <div>
+                    <p class="section-kicker">ACTIVE RECORDS</p>
+                    <h2 id="issuedTitle">Issued books registry</h2>
+                </div><span class="record-count" id="issuedCount">0 active records</span>
+            </div>
+            <div class="panel table-panel registry-panel">
+                <div class="table-toolbar">
+                    <div>
+                        <h3>Current circulation</h3>
+                        <p>Returns automatically calculate the applicable fine.</p>
+                    </div><span class="fine-key"><span></span> ₹2 / overdue day</span>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Book title</th>
+                                <th>Issue date</th>
+                                <th>Due date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="issuedTableBody"></tbody>
+                    </table>
+                </div>
+                <div class="empty-state" id="issuedEmpty" hidden><span class="empty-icon"
+                        aria-hidden="true">OK</span><strong>No active issue records</strong>
+                    <p>Issued books will appear here for easy tracking.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div><strong>Polytechnic Digital Library</strong><span>Academic resource management portal</span></div>
+        <span>Data is stored locally on this device.</span>
+    </footer>
+
+    <div class="modal-backdrop" id="receiptModal" hidden>
+        <section class="receipt-modal" role="dialog" aria-modal="true" aria-labelledby="receiptTitle"><button
+                class="modal-close" id="closeReceipt" type="button" aria-label="Close receipt">×</button>
+            <div class="receipt-paper" id="receiptPaper">
+                <div class="receipt-head"><span class="receipt-emblem">DL</span>
+                    <div>
+                        <p>POLYTECHNIC INSTITUTE</p>
+                        <h2 id="receiptTitle">Library Issue Slip</h2><span>Department of Computer Science &amp;
+                            Information Technology</span>
+                    </div>
+                </div>
+                <div class="receipt-rule"></div>
+                <div class="receipt-meta"><span>Receipt No. <strong id="receiptNumber"></strong></span><span>Issued on
+                        <strong id="receiptIssuedOn"></strong></span></div>
+                <div class="receipt-grid">
+                    <div><span>Student name</span><strong id="receiptStudent"></strong></div>
+                    <div><span>Enrollment / roll no.</span><strong id="receiptRoll"></strong></div>
+                    <div><span>Branch &amp; semester</span><strong id="receiptBranch"></strong></div>
+                    <div><span>Accession no.</span><strong id="receiptCode"></strong></div>
+                </div>
+                <div class="receipt-book"><span>BOOK ISSUED</span><strong id="receiptBook"></strong>
+                    <div><span>Issue date: <b id="receiptIssueDate"></b></span><span>Return due: <b
+                                id="receiptDueDate"></b></span></div>
+                </div>
+                <p class="receipt-policy"><strong>Library policy:</strong> Return the book on or before the due date. A
+                    late fine of ₹2 per day will be charged after the due date.</p>
+                <div class="signature-row">
+                    <div><span></span><small>Librarian signature</small></div>
+                    <div><span></span><small>Student signature</small></div>
+                </div>
+            </div><button class="button button-primary print-button" id="printReceipt" type="button"><span
+                    aria-hidden="true">⎙</span> Print / Save PDF</button>
+        </section>
+    </div>
+
+    <div class="app-dialog-backdrop" id="appDialog" hidden>
+        <section class="app-dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle"
+            aria-describedby="dialogMessage">
+            <div class="dialog-mark" aria-hidden="true">!</div>
+            <div class="dialog-content">
+                <p class="dialog-kicker">LIBRARY DESK</p>
+                <h2 id="dialogTitle">Confirm action</h2>
+                <p id="dialogMessage"></p>
+            </div>
+            <div class="dialog-actions"><button class="dialog-button dialog-cancel" id="dialogCancel"
+                    type="button">Cancel</button><button class="dialog-button dialog-confirm" id="dialogConfirm"
+                    type="button">Confirm</button></div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
