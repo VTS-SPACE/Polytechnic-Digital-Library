@@ -92,6 +92,13 @@ button {
     width: 42px;
     height: 42px;
     border-radius: 8px;
+}
+
+.brand-mark {
+    object-fit: cover;
+}
+
+.receipt-emblem {
     background: #e4ad52;
     color: var(--navy);
     font-weight: 800;
